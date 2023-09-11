@@ -1,0 +1,46 @@
+openapi: '3.0.3'
+info:
+  title: Implementación de SimpleApp de manera local
+  version: '0.1'
+  description: |-
+    En esta página de Swagger se implemente en Flask una de las genomics Apps, llamda SimpleApp con
+    los datos desplegados de manera local. 
+
+paths:
+  /subject-operations/genotype-operations/$find-subject-variants:
+    get:
+      description: >
+        Determine if simple variants are present that overlap range(s). (See section '<a href="http://build.fhir.org/ig/HL7/genomics-reporting/operations.html#simple-vs-structural-variant-operations">Simple vs. Structural variant operations</a>' for the distinction between simple and structural variants).
+      summary: "Find Subject Variants"
+      operationId: "app.endpoints.find_subject_variants"
+      tags:
+        - "Subject Genotype Operations"
+      responses:
+        '200':
+          description: "Returns a FHIR Parameters resource, containing each range requested, a boolean indicating if variants are present in a range, and optionally, the variants present in a range."
+          content:
+            application/json:
+              schema:
+                type: object
+      parameters:
+        - name: subject
+          in: query
+          schema:
+            format: PatientID
+            type: string
+            example: 'HG00403'
+          required: true
+          description: The subject of interest.
+        - name: ranges
+          in: query
+          required: true
+          description: List of regions to be searched for variants. Must be in zero-based RefSeq:Integer-range format.
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^\s*[Nn][A-Za-z]_\d{4,10}(\.)(\d{1,2}):\d{1,10}-\d{1,10}\s*$'
+            example:
+              - "NC_000019.9:11200138-11244496"
+          style: "form"
+          explode: false
